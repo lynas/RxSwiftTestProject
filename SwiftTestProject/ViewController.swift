@@ -11,32 +11,52 @@ import RxSwift
 import RxCocoa
 
 class ViewController: UIViewController {
-	
-	
-	@IBOutlet weak var textField: UITextField!
-	
-	@IBOutlet weak var textLabel: UILabel!
-	
-	let disposeBag = DisposeBag()
-	
-
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		// Do any additional setup after loading the view, typically from a nib.
-		let secuence = Observable.of(1,2,3)
-		_ = secuence
-			.map {
-				number in
-				number * 2
-			}
-			.subscribe{
-			print($0)
-		}
-		
-		_ = textField.rx.text.orEmpty.observeOn(MainScheduler.asyncInstance).bindTo(textLabel.rx.text).addDisposableTo(disposeBag)
-	}
-
-
-
+    
+    
+    @IBOutlet weak var textField: UITextField!
+    
+    @IBOutlet weak var textLabel: UILabel!
+    
+    let disposeBag = DisposeBag()
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        let secuence = Observable.of(1,2,3)
+        _ = secuence
+            .map {
+                number in
+                number * 2
+            }
+            .subscribe{
+                print($0)
+        }
+        
+//        _ = textField.rx.text.orEmpty.observeOn(MainScheduler.asyncInstance).bindTo(textLabel.rx.text).addDisposableTo(disposeBag)
+        
+        let textContent : Observable<String?> = textField.rx.text.asObservable()
+        textContent.subscribe(
+            onNext: {
+                str in
+                self.textLabel.text = str
+                
+        },
+            onError: { error in
+                print(error.localizedDescription)
+                
+        },
+            onCompleted: {
+                print("test")
+        },
+            onDisposed: {
+                print("completed")
+                
+        }
+        ).addDisposableTo(disposeBag)
+    }
+    
+    
+    
 }
 
